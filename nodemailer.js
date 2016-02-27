@@ -1,4 +1,5 @@
 'use strict';
+
 var util = require('util');
 
 module.exports = function (options) {
@@ -6,35 +7,12 @@ module.exports = function (options) {
     options.transform = function () {};
   }
 
-  /**
-   * Map the image from campaing to the node mailer attachment structure
-   * @param campaignImages
-   * @returns {Array}
-   */
-  function mapImageData(campaignImages) {
-
-    var mappedImages = [];
-
-    campaignImages.forEach(function (campaignImage) {
-
-      mappedImages.push({
-        filename: campaignImage.name,
-        content: campaignImage.data,
-        contentType: campaignImage.mime,
-        encoding: 'base64',
-        cid: campaignImage.name
-      });
-    });
-
-    return mappedImages;
-  }
-
   return {
     name: 'nodemailer',
     send: function (model, done) {
       var images = model.images ? model.images : [];
-      
-      //add header image if set 
+
+      //add header image if set
       if (model._header) {
         images.unshift({
           name: '_header',
@@ -42,7 +20,7 @@ module.exports = function (options) {
           mime: model._header.mime
         });
       }
-      
+
       var message = {
         from: model.from,
         to: model.to.join(', '),
@@ -55,4 +33,16 @@ module.exports = function (options) {
       options.transport.sendMail(transformed || message, done);
     }
   };
+
+  function mapImageData (campaignImages) {
+    return campaignImages.map(function campaignImageMapper (campaignImage) {
+      return {
+        filename: campaignImage.name,
+        content: campaignImage.data,
+        contentType: campaignImage.mime,
+        encoding: 'base64',
+        cid: campaignImage.name
+      };
+    });
+  }
 };
