@@ -20,6 +20,8 @@ module.exports = function (options) {
           mime: model._header.mime
         });
       }
+      
+      var attachments = (model.attachments || []).concat(mapImageData(images));
 
       var message = {
         from: model.from,
@@ -27,7 +29,7 @@ module.exports = function (options) {
         subject: model.subject,
         html: model.html,
         generateTextFromHTML: true,
-        attachments: mapImageData(images)
+        attachments: attachments
       };
       var transformed = options.transform(message);
       options.transport.sendMail(transformed || message, done);
