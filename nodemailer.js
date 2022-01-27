@@ -1,7 +1,5 @@
 'use strict';
 
-var util = require('util');
-
 module.exports = function (options) {
   if (!options.transform) {
     options.transform = function () {};
@@ -9,8 +7,8 @@ module.exports = function (options) {
 
   return {
     name: 'nodemailer',
-    send: function (model, done) {
-      var images = model.images ? model.images : [];
+    send: async function (model, done) {
+      const images = model.images ? model.images : [];
 
       //add header image if set
       if (model._header) {
@@ -21,7 +19,7 @@ module.exports = function (options) {
         });
       }
 
-      var message = {
+      const message = {
         from: model.from,
         to: model.to.join(', '),
         subject: model.subject,
@@ -29,7 +27,7 @@ module.exports = function (options) {
         generateTextFromHTML: true,
         attachments: mapImageData(images)
       };
-      var transformed = options.transform(message);
+      const transformed = options.transform(message);
       options.transport.sendMail(transformed || message, done);
     }
   };
